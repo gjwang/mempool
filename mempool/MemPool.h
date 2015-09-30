@@ -11,6 +11,7 @@
 
 #include "stdio.h"
 #include <iostream>
+#include <vector>
 
 namespace mempool {
 class PoolLock{
@@ -24,11 +25,11 @@ public:
     }
     
     void Lock(){
-        std::cout << "Lock\n";
+        //std::cout << "Lock\n";
         (void) pthread_mutex_lock(&_mutex);
     }
     void Unlock(){
-        std::cout << "UnLock\n";
+        //std::cout << "UnLock\n";
         (void) pthread_mutex_unlock(&_mutex);
     }
     
@@ -43,21 +44,18 @@ private:
 class  LockScoped {
 public:
 //    explicit LockScoped(PoolLock* lock): _lock(lock) {
-//        std::cout << "_lock->Lock()=" << _lock << "\n";
 //        _lock->Lock();
 //    }
     
     explicit LockScoped(std::shared_ptr<PoolLock> sharelock): _shareLock(sharelock) {
         //_lock->Lock();
 
-        //std::cout << "_shareLock=" << _shareLock.get() << "\n";
         _shareLock->Lock();
     }
     
     ~LockScoped(){
         //_lock->Unlock();
         
-        //sstd::cout << "_shareLock->Unlock()\n";
         _shareLock->Unlock();
     }
     
@@ -69,11 +67,23 @@ private:
 
 class MemPool{
 public:
-    MemPool();
-    void * GetMem();
+    //MemPool();
+    MemPool(size_t size, size_t count, bool isFixSize=true);
+    
+    
+    
+    uint8_t *GetMem();
+    void Release(uint8_t* buf);
     ~MemPool();
-
+    
 private:
+    size_t totalSize;
+    bool isFixedSize;
+    
+    uint8_t * data;
+    typedef std::pair<uint8_t*, bool> bufUsingMap;
+    std::vector<bufUsingMap> dataVector;
+    
     //PoolLock *_poolLock;
     std::shared_ptr<PoolLock> _shareLock;
 };
