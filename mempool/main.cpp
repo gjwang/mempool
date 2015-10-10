@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "MemPool.h"
+#include "MemPoolManager.h"
 
 using namespace mempool;
 
@@ -18,19 +19,28 @@ int main(int argc, const char * argv[]) {
     struct timeval timeBegin;
     struct timeval timeEnd;
     
-//    ts.tv_sec = tv.tv_sec + (milliseconds / 1000);
-//    ts.tv_nsec = tv.tv_usec * 1000 + (milliseconds % 1000) * 1000000;
-    
-    size_t itemSize = 10240;
+    size_t itemSize = 1024;
     size_t itemNum = 10;
     
-    std::shared_ptr<mempool::MemPool> pMemPool = std::make_shared<mempool::MemPool>(itemSize, itemNum);
+    std::string memPoolName_1("VideoFrameMemPool_itemSize_itemNum_1");
+    std::string memPoolName_2("VideoFrameMemPool_itemSize_itemNum_2");
+
     
-    int testTimes = 10000000;
+    //std::shared_ptr<mempool::MemPool> pMemPool = std::make_shared<mempool::MemPool>(itemSize, itemNum);
+    //mempool::MemPool *pMemPool = mempool::MemPool::GetIntance();
+    
+    MemPoolManager * mpManager = MemPoolManager::GetInstance();
+    mpManager->InitMemPoolByName(memPoolName_1, itemSize, itemNum);
+    mpManager->InitMemPoolByName(memPoolName_2, itemSize, itemNum);
+
+    mempool::MemPool *pMemPool = mpManager->GetMemPoolByName(memPoolName_1);
+    
+    
+    
+    int testTimes = 1000000;
     gettimeofday(&timeBegin, NULL);
     for (int i = 0; i < testTimes; i++) {
         uint8_t * buf = pMemPool->GetMem();
-        //std::cout << "getMem=" << (void*)buf << '\n';
         pMemPool->Release(buf);
     }
     gettimeofday(&timeEnd, NULL);
@@ -50,6 +60,14 @@ int main(int argc, const char * argv[]) {
     std::cout << "malloc  used time=" <<
     (timeEnd.tv_sec - timeBegin.tv_sec)*1000000 +
     (timeEnd.tv_usec-timeBegin.tv_usec) << "usec" << std::endl;
+    
+    
+    //mpManager->DeInitMemPoolByName(memPoolName_1);
+    //mpManager->DeInitMemPoolByName(memPoolName_2);
+    mpManager->DeInitMemPoolAll();
+    
+    //std::cout << "mpManager->~MemPoolManager()" << std::endl;
+    //mpManager->~MemPoolManager();
     
     return 0;
 }

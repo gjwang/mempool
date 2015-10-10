@@ -19,18 +19,16 @@ public:
     explicit PoolLock(){
         std::cout << "PoolLock() this=" << this << "\n";
         pthread_mutexattr_t attr;
-        (void) pthread_mutexattr_init(&attr);
-        (void) pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-        (void) pthread_mutex_init(&_mutex, &attr);
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&_mutex, &attr);
     }
     
     void Lock(){
-        //std::cout << "Lock\n";
-        (void) pthread_mutex_lock(&_mutex);
+        pthread_mutex_lock(&_mutex);
     }
     void Unlock(){
-        //std::cout << "UnLock\n";
-        (void) pthread_mutex_unlock(&_mutex);
+        pthread_mutex_unlock(&_mutex);
     }
     
     virtual ~PoolLock(){
@@ -70,6 +68,7 @@ public:
     //MemPool();
     MemPool(size_t size, size_t count, bool isFixSize=true);
     
+    //MemPool* GetIntance();
     
     
     uint8_t *GetMem();

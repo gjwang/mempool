@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A322600D1BBBC6D200FF163F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A322600C1BBBC6D200FF163F /* main.cpp */; };
 		A32260101BBBC6DD00FF163F /* MemPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A322600E1BBBC6DD00FF163F /* MemPool.cpp */; };
+		A324EC551BC8C1940018C8BB /* MemPoolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A324EC531BC8C1940018C8BB /* MemPoolManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,8 @@
 		A322600C1BBBC6D200FF163F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A322600E1BBBC6DD00FF163F /* MemPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemPool.cpp; sourceTree = "<group>"; };
 		A322600F1BBBC6DD00FF163F /* MemPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemPool.h; sourceTree = "<group>"; };
+		A324EC531BC8C1940018C8BB /* MemPoolManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemPoolManager.cpp; sourceTree = "<group>"; };
+		A324EC541BC8C1940018C8BB /* MemPoolManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemPoolManager.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,8 @@
 				A322600C1BBBC6D200FF163F /* main.cpp */,
 				A322600E1BBBC6DD00FF163F /* MemPool.cpp */,
 				A322600F1BBBC6DD00FF163F /* MemPool.h */,
+				A324EC531BC8C1940018C8BB /* MemPoolManager.cpp */,
+				A324EC541BC8C1940018C8BB /* MemPoolManager.h */,
 			);
 			path = mempool;
 			sourceTree = "<group>";
@@ -123,6 +128,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A324EC551BC8C1940018C8BB /* MemPoolManager.cpp in Sources */,
 				A322600D1BBBC6D200FF163F /* main.cpp in Sources */,
 				A32260101BBBC6DD00FF163F /* MemPool.cpp in Sources */,
 			);

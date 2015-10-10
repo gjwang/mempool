@@ -12,12 +12,9 @@
 
 namespace mempool{
 
-//MemPool::MemPool():
-//        /*_poolLock(new PoolLock()),*/
-//        _shareLock(std::make_shared<PoolLock>()),
-//        data(nullptr){
-//    std::cout << "MemPool Constructor\n";
-//            
+//MemPool* MemPool::GetIntance(){
+//    static MemPool* mPool = new MemPool(1024, 10);
+//    return mPool;
 //};
 
 MemPool::MemPool(size_t size, size_t count, bool isFixedSize):
@@ -36,7 +33,7 @@ MemPool::MemPool(size_t size, size_t count, bool isFixedSize):
         
     std::cout << "dataVector size=" << dataVector.size() << "\n";
     
-}
+};
     
 uint8_t* MemPool::GetMem(){
     LockScoped lc(_shareLock);
@@ -57,8 +54,11 @@ void MemPool::Release(uint8_t* buf){
     for (; it != dataVector.end(); it++) {
         if (it->first == buf) {
             it->second = false;
+            return;
         }
     }
+    
+    std::cout << "Release buf not exist";
 };
     
 MemPool::~MemPool(){
