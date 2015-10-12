@@ -53,10 +53,12 @@ public:
         _lock->Unlock();
     }
     
+    void* operator new (std::size_t size) throw (std::bad_alloc) = delete;
+    void* operator new[] (std::size_t size) throw (std::bad_alloc) = delete;
+    void operator delete (void *) = delete;
+    void operator delete[] (void *) = delete;
 private:
     PoolLock* _lock;
-    
-    void* operator new (std::size_t size) throw (std::bad_alloc) = delete;
 };
 
 }
