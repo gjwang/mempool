@@ -29,15 +29,15 @@ int main(int argc, const char * argv[]) {
     //std::shared_ptr<mempool::MemPool> pMemPool = std::make_shared<mempool::MemPool>(itemSize, itemNum);
     //mempool::MemPool *pMemPool = mempool::MemPool::GetIntance();
     
-    MemPoolManager * mpManager = MemPoolManager::GetInstance();
+    MemPoolManager * mpManager = MemPoolManager::getInstance();
     mpManager->InitMemPoolByName(memPoolName_1, itemSize, itemNum);
     mpManager->InitMemPoolByName(memPoolName_2, itemSize, itemNum);
 
-    mempool::MemPool *pMemPool = mpManager->GetMemPoolByName(memPoolName_1);
+    mempool::MemPool *pMemPool = mpManager->getMemPoolByName(memPoolName_1);
     
     
     
-    int testTimes = 1000000;
+    const int testTimes = 1000000;
     gettimeofday(&timeBegin, NULL);
     for (int i = 0; i < testTimes; i++) {
         uint8_t * buf = pMemPool->GetMem();

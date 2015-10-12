@@ -41,25 +41,20 @@ private:
 
 class  LockScoped {
 public:
-//    explicit LockScoped(PoolLock* lock): _lock(lock) {
-//        _lock->Lock();
-//    }
+    explicit LockScoped(PoolLock* lock): _lock(lock) {
+        _lock->Lock();
+    }
     
-    explicit LockScoped(std::shared_ptr<PoolLock> sharelock): _shareLock(sharelock) {
-        //_lock->Lock();
-
-        _shareLock->Lock();
+    explicit LockScoped(std::shared_ptr<PoolLock> sharelock): _lock(sharelock.get()) {
+        _lock->Lock();
     }
     
     ~LockScoped(){
-        //_lock->Unlock();
-        
-        _shareLock->Unlock();
+        _lock->Unlock();
     }
     
 private:
-    //PoolLock* _lock;
-    std::shared_ptr<PoolLock> _shareLock;
+    PoolLock* _lock;
 };
 
 

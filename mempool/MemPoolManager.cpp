@@ -9,11 +9,30 @@
 #include "MemPoolManager.h"
 
 namespace mempool{
-MemPoolManager* MemPoolManager::GetInstance(){
+
+MemPoolManager* volatile MemPoolManager::pInstance = 0;
+//std::shared_ptr<PoolLock> MemPoolManager::_shareLock = std::make_shared<PoolLock>();
+    
+MemPoolManager* MemPoolManager::getInstance(){
+#if 0
     //define a static local variable, so that it is leaked,
     //and its destructors are not called at exit.
     static MemPoolManager* mPoolManager = new MemPoolManager();
     return mPoolManager;
+#else
+    //double check singleton
+    if (pInstance == 0) {
+        //define a static lock so it is leaked after called exit
+        static PoolLock* lock = new PoolLock();
+        LockScoped ls(lock);
+        //LockScoped ls(_shareLock);
+        if (pInstance == 0) {
+            MemPoolManager* temp = new MemPoolManager(); // volatile added
+            pInstance = temp;
+        }
+    }
+    return pInstance;
+#endif
 };
 
 MemPoolManager::MemPoolManager(){
@@ -31,7 +50,7 @@ void MemPoolManager::InitMemPoolByName(std::string memPoolName, size_t itemSize,
     
 }
 
-MemPool* MemPoolManager::GetMemPoolByName(std::string& memPoolName){
+MemPool* MemPoolManager::getMemPoolByName(std::string& memPoolName){
     MemPoolMapType::iterator it = mMemPoolMap.find(memPoolName);
     if (it != mMemPoolMap.end()) {
         return it->second;

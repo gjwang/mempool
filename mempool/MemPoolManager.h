@@ -21,12 +21,12 @@ typedef std::map<std::string, MemPool*> MemPoolMapType;
     
 class MemPoolManager{
 public:
-    static MemPoolManager* GetInstance();
+    static MemPoolManager* getInstance();
     
     MemPoolManager();
 
     void InitMemPoolByName(std::string memPoolName, size_t itemSize, size_t count, bool isFixedSize=true);
-    MemPool *GetMemPoolByName(std::string& memPoolName);
+    MemPool *getMemPoolByName(std::string& memPoolName);
 
     void DeInitMemPoolByName(std::string& memPoolName);
     void DeInitMemPoolAll();
@@ -34,6 +34,8 @@ public:
     ~MemPoolManager();
     
 private:
+    static MemPoolManager* volatile pInstance;
+    //static std::shared_ptr<PoolLock> _shareLock;
     
     MemPoolMapType mMemPoolMap;
 };
