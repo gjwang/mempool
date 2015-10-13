@@ -19,7 +19,6 @@ namespace mempool{
 class PoolLock{
 public:
     explicit PoolLock(){
-        //std::cout << "PoolLock() this=" << this << "\n";
         pthread_mutexattr_t attr;
         pthread_mutexattr_init(&attr);
         pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -45,30 +44,55 @@ private:
 class CASLock{
 public:
     explicit CASLock(): isLocking(false){
-
+        pthread_key_create(&_key, NULL);
     }
         
     void Lock(){
-        while (!__sync_bool_compare_and_swap(&isLocking, false, true)) {
-            //TODO: add atomic_refcount, to cancel acquring the lock, to prevent deadlock
-            usleep(100);
-        };
-        //TODO: need to add memory barrier?
+        //use lockTimes to let the same thread locks and unlocks multi times
+        //like lock{lock{critical_resource}}
+        void* pLockTimes = pthread_getspecific(_key);
+        size_t lockTimes = 0;
+        if(pLockTimes == NULL){
+            pthread_setspecific(_key, (void*)lockTimes);
+        }else{
+            lockTimes = (size_t)pthread_getspecific(_key);
+        }
+        
+        //if lockTimes!=0,
+        //it means the current thread is the same thread which already holds the lock
+        if (lockTimes == 0) {
+            while (!__sync_bool_compare_and_swap(&isLocking, false, true)) {
+                usleep(100);
+            };
+        }
+        
+        lockTimes++;
+        pthread_setspecific(_key, (void*)lockTimes);
+        
     }
     
     void Unlock(){
-        while (!__sync_bool_compare_and_swap(&isLocking, true, false)) {
-            //std::cout << "should not happen!";
-            //TODO: add atomic_refcount, to cancel acquring the lock, to prevent deadlock
-            usleep(1);
-        };
-        //TODO: need to add memory barrier?
+        size_t lockTimes = (size_t)(pthread_getspecific(_key));
+        
+        lockTimes--;
+        pthread_setspecific(_key, (void*)lockTimes);
+
+        if (lockTimes==0) {
+            _thread = nullptr;
+            while (!__sync_bool_compare_and_swap(&isLocking, true, false)) {
+                std::cout << "should not happen!";
+                usleep(1);
+            };
+        }
     }
     
     ~CASLock(){
+        pthread_key_delete(_key);
     };
         
 private:
+    pthread_t _thread;
+    pthread_key_t _key;
     bool isLocking;
 };
     

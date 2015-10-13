@@ -20,16 +20,29 @@ using namespace mempool;
 
 #define NUM_THREADS 4
 
-volatile int64_t globalCount = 0;
-const int addPerforTimes = 1000000000;
-static PoolLock addLock;
+int64_t  globalCount = 0;
+const int64_t  addPerforTimes = 10000000;
+PoolLock addLock;
+
+void subtask(){
+    LockScoped ls(&addLock);
+    globalCount++;
+}
+
+void task(){
+    LockScoped ls(&addLock);
+    subtask();
+}
+
+
 void *perform_work(void *argument)
 {
-    for (int i = 0; i < addPerforTimes; i++) {
-#if 0
+    for (int64_t i = 0; i < addPerforTimes; i++) {
+#if 1
         LockScoped ls(&addLock);
+        //task();
         globalCount++;
-#elif 1
+#elif 0
         //__sync_add_and_fetch(&globalCount, 1);
         
 //        while (!__sync_bool_compare_and_swap(&globalCount, globalCount, globalCount+1)){
@@ -72,10 +85,6 @@ int main(int argc, const char * argv[]) {
     mpManager->InitMemPoolByName(memPoolName_2, itemSize, itemNum);
 
     mempool::MemPool *pMemPool = mpManager->getMemPoolByName(memPoolName_1);
-    
-    int a = 0;
-    __sync_fetch_and_add(&a,10);
-    std::cout << a << std::endl;
     
     const int testTimes = 1000000;
     gettimeofday(&timeBegin, NULL);
@@ -133,7 +142,12 @@ int main(int argc, const char * argv[]) {
     (timeEnd.tv_sec - timeBegin.tv_sec)*1000000 +
     (timeEnd.tv_usec-timeBegin.tv_usec) << "usec" << std::endl;
     
-    std::cout << "globalCount=" << globalCount << std::endl;;
-    printf("In main: All threads completed successfully\n");
+    printf("All threads completed, globalCount=%lld, addPerforTimes=%lld\n", globalCount, addPerforTimes);
+    
+    if (addPerforTimes*NUM_THREADS ==  globalCount) {
+        std::cout << "Lock OK!" << std::endl;
+    }else{
+        std::cout << "Lock FAILED!" << std::endl;
+    }
     return 0;
 }
