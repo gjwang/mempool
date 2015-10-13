@@ -11,9 +11,11 @@
 
 #include <iostream>
 #include <vector>
-
 #include <stdio.h>
+#include <unistd.h>
+
 namespace mempool{
+#if 0
 class PoolLock{
 public:
     explicit PoolLock(){
@@ -31,14 +33,48 @@ public:
         pthread_mutex_unlock(&_mutex);
     }
     
-    virtual ~PoolLock(){
-        std::cout << "~PoolLock()" << "\n";
+    ~PoolLock(){
+        pthread_mutex_destroy(&_mutex);
     };
     
 private:
     pthread_mutex_t _mutex;
 };
 
+#else
+class CASLock{
+public:
+    explicit CASLock(): isLocking(false){
+
+    }
+        
+    void Lock(){
+        while (!__sync_bool_compare_and_swap(&isLocking, false, true)) {
+            //TODO: add atomic_refcount, to cancel acquring the lock, to prevent deadlock
+            usleep(100);
+        };
+        //TODO: need to add memory barrier?
+    }
+    
+    void Unlock(){
+        while (!__sync_bool_compare_and_swap(&isLocking, true, false)) {
+            //std::cout << "should not happen!";
+            //TODO: add atomic_refcount, to cancel acquring the lock, to prevent deadlock
+            usleep(1);
+        };
+        //TODO: need to add memory barrier?
+    }
+    
+    ~CASLock(){
+    };
+        
+private:
+    bool isLocking;
+};
+    
+typedef CASLock PoolLock;
+#endif
+    
 class  LockScoped {
 public:
     explicit LockScoped(PoolLock* lock): _lock(lock) {
@@ -53,6 +89,8 @@ public:
         _lock->Unlock();
     }
     
+    //To prevent alloc LockScoped in heap memory,
+    //Only alloc LockScoped in stack memory
     void* operator new (std::size_t size) throw (std::bad_alloc) = delete;
     void* operator new[] (std::size_t size) throw (std::bad_alloc) = delete;
     void operator delete (void *) = delete;

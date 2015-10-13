@@ -8,12 +8,30 @@
 
 #include <sys/time.h>
 #include <time.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include <iostream>
 #include "MemPool.h"
 #include "MemPoolManager.h"
 
 using namespace mempool;
+
+#define NUM_THREADS 4
+
+volatile int64_t globalCount = 0;
+const int addPerforTimes = 1000000000;
+static PoolLock addLock;
+void *perform_work(void *argument)
+{
+    for (int i = 0; i < addPerforTimes; i++) {
+        LockScoped ls(&addLock);
+        globalCount++;
+    }
+    
+    return NULL;
+}
 
 int main(int argc, const char * argv[]) {
     struct timeval timeBegin;
@@ -35,7 +53,9 @@ int main(int argc, const char * argv[]) {
 
     mempool::MemPool *pMemPool = mpManager->getMemPoolByName(memPoolName_1);
     
-    
+    int a = 0;
+    __sync_fetch_and_add(&a,10);
+    std::cout << a << std::endl;
     
     const int testTimes = 1000000;
     gettimeofday(&timeBegin, NULL);
@@ -66,8 +86,34 @@ int main(int argc, const char * argv[]) {
     //mpManager->DeInitMemPoolByName(memPoolName_2);
     mpManager->DeInitMemPoolAll();
     
-    //std::cout << "mpManager->~MemPoolManager()" << std::endl;
-    //mpManager->~MemPoolManager();
+
+    //-------threads test CASLock and mutexLock---------------------
     
+    pthread_t threads[NUM_THREADS];
+    int thread_args[NUM_THREADS];
+    int result_code, index;
+    
+    gettimeofday(&timeBegin, NULL);
+    for (index = 0; index < NUM_THREADS; ++index) {
+        thread_args[index] = index;
+        result_code = pthread_create(&threads[index], NULL, perform_work, (void *) &thread_args[index]);
+        assert(0 == result_code);
+    }
+    
+    // wait for each thread to complete
+    for (index = 0; index < NUM_THREADS; ++index) {
+        // block until thread 'index' completes
+        result_code = pthread_join(threads[index], NULL);
+        //printf("In main: thread %d has completed\n", index);
+        assert(0 == result_code);
+    }
+    
+    gettimeofday(&timeEnd, NULL);
+    std::cout << "threads add used time=" <<
+    (timeEnd.tv_sec - timeBegin.tv_sec)*1000000 +
+    (timeEnd.tv_usec-timeBegin.tv_usec) << "usec" << std::endl;
+    
+    std::cout << "globalCount=" << globalCount << std::endl;;
+    printf("In main: All threads completed successfully\n");
     return 0;
 }
