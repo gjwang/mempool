@@ -13,6 +13,7 @@
 #include <vector>
 #include <stdio.h>
 #include <unistd.h>
+#include <assert.h>
 
 namespace mempool{
 #if 0
@@ -44,22 +45,16 @@ private:
 class CASLock{
 public:
     explicit CASLock(): isLocking(false){
-        pthread_key_create(&_key, NULL);
+        pthread_key_create(&mLockTimeKey, NULL);
     }
         
     void Lock(){
         //use lockTimes to let the same thread locks and unlocks multi times
         //like lock{lock{critical_resource}}
-        void* pLockTimes = pthread_getspecific(_key);
-        size_t lockTimes = 0;
-        if(pLockTimes == NULL){
-            pthread_setspecific(_key, (void*)lockTimes);
-        }else{
-            lockTimes = (size_t)pthread_getspecific(_key);
-        }
+        size_t lockTimes = (size_t)pthread_getspecific(mLockTimeKey);
         
         //if lockTimes!=0,
-        //it means the current thread is the same thread which already holds the lock
+        //it means the current thread is the same which already holds the lock
         if (lockTimes == 0) {
             while (!__sync_bool_compare_and_swap(&isLocking, false, true)) {
                 usleep(100);
@@ -67,18 +62,19 @@ public:
         }
         
         lockTimes++;
-        pthread_setspecific(_key, (void*)lockTimes);
+        pthread_setspecific(mLockTimeKey, (void*)lockTimes);
         
     }
     
     void Unlock(){
-        size_t lockTimes = (size_t)(pthread_getspecific(_key));
+        size_t lockTimes = (size_t)pthread_getspecific(mLockTimeKey);
         
         lockTimes--;
-        pthread_setspecific(_key, (void*)lockTimes);
+        assert(lockTimes >= 0);
+        
+        pthread_setspecific(mLockTimeKey, (void*)lockTimes);
 
-        if (lockTimes==0) {
-            _thread = nullptr;
+        if (lockTimes == 0) {
             while (!__sync_bool_compare_and_swap(&isLocking, true, false)) {
                 std::cout << "should not happen!";
                 usleep(1);
@@ -87,12 +83,11 @@ public:
     }
     
     ~CASLock(){
-        pthread_key_delete(_key);
+        pthread_key_delete(mLockTimeKey);
     };
         
 private:
-    pthread_t _thread;
-    pthread_key_t _key;
+    pthread_key_t mLockTimeKey;
     bool isLocking;
 };
     
