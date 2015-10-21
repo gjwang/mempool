@@ -16,6 +16,8 @@
 #include "MemPool.h"
 #include "MemPoolManager.h"
 
+#include "threadNonSyncTest.h"
+
 using namespace mempool;
 
 #define NUM_THREADS 4
@@ -67,6 +69,9 @@ void *perform_work(void *argument)
 }
 
 int main(int argc, const char * argv[]) {
+    threadNonSyncTest();
+    
+    
     struct timeval timeBegin;
     struct timeval timeEnd;
     
