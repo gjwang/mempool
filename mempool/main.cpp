@@ -40,31 +40,11 @@ void task(){
 void *perform_work(void *argument)
 {
     for (int64_t i = 0; i < addPerforTimes; i++) {
-#if 1
         LockScoped ls(&addLock);
         //task();
         globalCount++;
-#elif 0
-        //__sync_add_and_fetch(&globalCount, 1);
-        
-//        while (!__sync_bool_compare_and_swap(&globalCount, globalCount, globalCount+1)){
-//            usleep(100);
-//        }
-        int64_t tmp;
-        int64_t tmp2;
-        while (true) {
-            tmp = globalCount;
-            tmp2 = tmp + 1;
-            if (__sync_bool_compare_and_swap(&globalCount, tmp, tmp2)) {
-                break;
-            }
-            usleep(100);
-        };
-        
-#endif
     }
-    
-    
+
     return NULL;
 }
 
