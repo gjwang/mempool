@@ -16,10 +16,9 @@
 #include <assert.h>
 
 namespace mempool{
-#if 0
-class PoolLock{
+class PosixLock{
 public:
-    explicit PoolLock(){
+    explicit PosixLock(){
         pthread_mutexattr_t attr;
         pthread_mutexattr_init(&attr);
         pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -29,11 +28,12 @@ public:
     void Lock(){
         pthread_mutex_lock(&_mutex);
     }
+    
     void Unlock(){
         pthread_mutex_unlock(&_mutex);
     }
     
-    ~PoolLock(){
+    ~PosixLock(){
         pthread_mutex_destroy(&_mutex);
     };
     
@@ -41,7 +41,6 @@ private:
     pthread_mutex_t _mutex;
 };
 
-#else
 class CASLock{
 public:
     explicit CASLock(): isLocking(false){
@@ -91,8 +90,8 @@ private:
     bool isLocking;
 };
     
-typedef CASLock PoolLock;
-#endif
+typedef CASLock   PoolLock;
+//typedef PosixLock PoolLock;
     
 class  LockScoped {
 public:

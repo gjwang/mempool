@@ -11,6 +11,8 @@
 		A32260101BBBC6DD00FF163F /* MemPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A322600E1BBBC6DD00FF163F /* MemPool.cpp */; };
 		A324EC551BC8C1940018C8BB /* MemPoolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A324EC531BC8C1940018C8BB /* MemPoolManager.cpp */; };
 		A324EC5C1BCB64790018C8BB /* PoolLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A324EC5A1BCB64790018C8BB /* PoolLock.cpp */; };
+		A3A0155F1BDB65B1006C9C9E /* threadNonSyncTest.c in Sources */ = {isa = PBXBuildFile; fileRef = A3A0155D1BDB65B1006C9C9E /* threadNonSyncTest.c */; };
+		A3A015621BDB6C6B006C9C9E /* threadPosixLockPerfTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3A015601BDB6C6B006C9C9E /* threadPosixLockPerfTest.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +36,10 @@
 		A324EC541BC8C1940018C8BB /* MemPoolManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemPoolManager.h; sourceTree = "<group>"; };
 		A324EC5A1BCB64790018C8BB /* PoolLock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PoolLock.cpp; sourceTree = "<group>"; };
 		A324EC5B1BCB64790018C8BB /* PoolLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PoolLock.h; sourceTree = "<group>"; };
+		A3A0155D1BDB65B1006C9C9E /* threadNonSyncTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = threadNonSyncTest.c; sourceTree = "<group>"; };
+		A3A0155E1BDB65B1006C9C9E /* threadNonSyncTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadNonSyncTest.h; sourceTree = "<group>"; };
+		A3A015601BDB6C6B006C9C9E /* threadPosixLockPerfTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = threadPosixLockPerfTest.cpp; sourceTree = "<group>"; };
+		A3A015611BDB6C6B006C9C9E /* threadPosixLockPerfTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadPosixLockPerfTest.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,8 +77,12 @@
 				A322600F1BBBC6DD00FF163F /* MemPool.h */,
 				A324EC531BC8C1940018C8BB /* MemPoolManager.cpp */,
 				A324EC541BC8C1940018C8BB /* MemPoolManager.h */,
+				A3A0155D1BDB65B1006C9C9E /* threadNonSyncTest.c */,
+				A3A0155E1BDB65B1006C9C9E /* threadNonSyncTest.h */,
 				A324EC5A1BCB64790018C8BB /* PoolLock.cpp */,
 				A324EC5B1BCB64790018C8BB /* PoolLock.h */,
+				A3A015601BDB6C6B006C9C9E /* threadPosixLockPerfTest.cpp */,
+				A3A015611BDB6C6B006C9C9E /* threadPosixLockPerfTest.h */,
 			);
 			path = mempool;
 			sourceTree = "<group>";
@@ -134,7 +144,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A324EC5C1BCB64790018C8BB /* PoolLock.cpp in Sources */,
+				A3A015621BDB6C6B006C9C9E /* threadPosixLockPerfTest.cpp in Sources */,
 				A324EC551BC8C1940018C8BB /* MemPoolManager.cpp in Sources */,
+				A3A0155F1BDB65B1006C9C9E /* threadNonSyncTest.c in Sources */,
 				A322600D1BBBC6D200FF163F /* main.cpp in Sources */,
 				A32260101BBBC6DD00FF163F /* MemPool.cpp in Sources */,
 			);
