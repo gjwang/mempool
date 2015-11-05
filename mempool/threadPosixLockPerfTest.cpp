@@ -23,8 +23,10 @@ typedef	long long		int64_t;
 
 #define NUM_THREADS (4)
 
-static int64_t  globalCount = 0;
-static const int64_t  addPerforTimes = 100000000;
+using namespace mempool;
+
+volatile static int64_t  globalCount = 0;
+static const int64_t  addPerforTimes = 10000;
 static const int testTimes = 10;
 
 void *threadNonSyncwork(void *argument){
@@ -43,6 +45,25 @@ void *threadSyncwork(void *argument){
     return NULL;
 }
 
+CASLock casLock;
+PosixLock posixLock;
+void *threadPosixSyncwork(void *argument){
+    for (int64_t i = 0; i < addPerforTimes; i++) {
+        LockScopedTemp<PosixLock> posixLs(&posixLock);
+        globalCount++;
+    }
+    return NULL;
+}
+
+void *threadCASSyncwork(void *argument){
+    for (int64_t i = 0; i < addPerforTimes; i++) {
+        LockScopedTemp<CASLock> casLs(&casLock);
+        globalCount++;
+    }
+    return NULL;
+}
+
+
 void *threadSyncAddAndFetchWorker(void *argument){
     for (int64_t i = 0; i < addPerforTimes; i++) {
         __sync_add_and_fetch(&globalCount, 1);
@@ -51,7 +72,7 @@ void *threadSyncAddAndFetchWorker(void *argument){
     return NULL;
 }
 
-void *threadCASSyncWorker(void *argument){
+void *thread_cmp_and_swap_SyncWorker(void *argument){
     for (int64_t i = 0; i < addPerforTimes; i++) {
         int64_t tmp;
         int64_t tmp2;
@@ -90,6 +111,9 @@ void threadLockPerfTest(void *(*threadWorkerFunc)(void *)){
     gettimeofday(&timeEnd, NULL);
     
     if (threadNonSyncwork != threadWorkerFunc) {
+//        std::cout << "globalCount=" << globalCount
+//                  << ", NUM_THREADS*addPerforTimes=" << NUM_THREADS*addPerforTimes;
+
         assert(globalCount == NUM_THREADS*addPerforTimes);
     }
     globalCount = 0;
@@ -108,6 +132,11 @@ int main(int argc, const char * argv[]) {
     }
     std::cout << std::endl;
     
+//    std::cout << "thread cmp and swap sync Performance: usec" << std::endl;
+//    for (i = 0; i<testTimes; i++) {
+//        threadLockPerfTest( thread_cmp_and_swap_SyncWorker );
+//    }
+//    std::cout << std::endl;
     
     std::cout << "thread Posix sync Performance: usec" << std::endl;
     for (i = 0; i<testTimes; i++) {
@@ -115,18 +144,21 @@ int main(int argc, const char * argv[]) {
     }
     std::cout << std::endl;
 
+    std::cout << "thread template Posix sync Performance: usec" << std::endl;
+    for (i = 0; i<testTimes; i++) {
+        threadLockPerfTest( threadPosixSyncwork );
+    }
+    std::cout << std::endl;
+
+    std::cout << "thread template CAS sync Performance: usec" << std::endl;
+    for (i = 0; i<testTimes; i++) {
+        threadLockPerfTest( threadCASSyncwork );
+    }
+    std::cout << std::endl;
     
     std::cout << "thread sync_add_and_fetch Performance: usec" << std::endl;
     for (i = 0; i<testTimes; i++) {
         threadLockPerfTest( threadSyncAddAndFetchWorker );
     }
     std::cout << std::endl;
-
-    
-    std::cout << "thread CAS sync Performance: usec" << std::endl;
-    for (i = 0; i<testTimes; i++) {
-        threadLockPerfTest( threadCASSyncWorker );
-    }
-    std::cout << std::endl;
-
 }

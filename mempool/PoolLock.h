@@ -90,8 +90,8 @@ private:
     bool isLocking;
 };
     
-typedef CASLock   PoolLock;
-//typedef PosixLock PoolLock;
+//typedef CASLock   PoolLock;
+typedef PosixLock PoolLock;
     
 class  LockScoped {
 public:
@@ -115,6 +115,27 @@ public:
     void operator delete[] (void *) = delete;
 private:
     PoolLock* _lock;
+};
+
+template <typename T>
+class LockScopedTemp {
+public:
+    explicit LockScopedTemp(T* lock): _lock(lock) {
+        _lock->Lock();
+    }
+        
+    ~LockScopedTemp(){
+        _lock->Unlock();
+    }
+        
+    //To prevent alloc LockScoped in heap memory,
+    //Only alloc LockScoped in stack memory
+    void* operator new (std::size_t size) throw (std::bad_alloc) = delete;
+    void* operator new[] (std::size_t size) throw (std::bad_alloc) = delete;
+    void operator delete (void *) = delete;
+    void operator delete[] (void *) = delete;
+private:
+    T* _lock;
 };
 
 }
